@@ -11,6 +11,14 @@ $(document).ready(function () {
 		this.player2 = "O";
 
 	};
+	Game.prototype.checkBoard = function () {
+		var board = [];
+		for (var i = 0; i < 9 ; i++) {
+			board[i] = $("#item" + (i + 1)).html();
+		}
+		return board;
+
+	};
 	//This checks if we have the same token in  vertical , horizontal and diagonal lines
     Game.prototype.checkWin = function (player, board) {
 		if (
@@ -29,7 +37,31 @@ $(document).ready(function () {
 		}
 
 	};
-});
+	//this function checks if the board is complete return false
+	Game.prototype.checkTie = function (numClick) {
+		/*var board = this.checkBoard(),
+			arrLenth = board.length;
+
+		for (var i = 0; i < b ;i++) {
+			if (board[i] === "")break;*/
+		 return numClick === 9 ? true : false;
+
+	};
+	//this provide to the game logic where CPU can do a valid move
+	Game.prototype.emptyCells = function (i, maxmin, board) {
+		//we need a new board
+		var newBoard = this.checkBoard();
+		if(newBoard[i] === ""){
+			newBoard[i] = maxmin;
+			return newBoard;
+		} else {
+			return false;
+		}
+
+
+
+	}
+ });
 
 
 
