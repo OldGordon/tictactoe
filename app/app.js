@@ -38,14 +38,17 @@ $(document).ready(function () {
 
 	};
 	//this function checks if the board is complete return false
-	Game.prototype.checkTie = function (numClick) {
-		/*var board = this.checkBoard(),
-			arrLenth = board.length;
+	Game.prototype.checkTie = function () {
 
-		for (var i = 0; i < b ;i++) {
-			if (board[i] === "")break;*/
-		 return numClick === 9 ? true : false;
-
+		var board = this.checkBoard(),
+			arrLengh = board.length;
+		//if we found an empty cell the game is not over
+		for (var i = 0; i < arrLengh; i++) {
+			if (board[i] === ""){
+				return false;
+			}
+		}
+		return  true;
 	};
 	//this provide to the game logic where CPU can do a valid move
 	Game.prototype.emptyCells = function (i, maxmin, board) {
@@ -60,8 +63,8 @@ $(document).ready(function () {
 
 
 
-	}
- });
+	};
+});
 
 
 
