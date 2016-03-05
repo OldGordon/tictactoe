@@ -3,8 +3,7 @@
 /*jshint strict: false*/
 /*global $, jQuery, alert*/
 
-$(document).ready(function () {
-	'use strict';
+
 	var player = 1,
 		cpu = 2,
 		playing = 0,
@@ -13,7 +12,7 @@ $(document).ready(function () {
 
 	//constructor for the game board
 	var Board = function () {
-		//to keep playerOn values
+		//we keep here 1,2 or 0 if the cell is empty
 		this.board = [];
 		//to write the "X" or "O" symbols
 		this.cells = [];
@@ -29,16 +28,16 @@ $(document).ready(function () {
 		this.board = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 	};
 	//checks if a cell is empty.Return Bool
-	Board.prototype.isEmptyCell = function(cell) {
-		return (this.board[cell] === 0 );
+	Board.prototype.isEmptyCell = function(val) {
+		return (this.board[val] === 0 );
 	};
 	//write a cell with the value passed
-	Board.prototype.writeCell = function(value, num) {
-		this.board[num] = value;
-		console.log(value , num);
+	Board.prototype.writeCell = function(num, cell) {
+		this.board[cell] = num;
+		//console.log(cell , num);
 	};
 	//This checks if we have the same token in  vertical , horizontal and diagonal lines
-    Board.prototype.checkWin = function (player) {
+    Board.prototype.checkWin = function(player) {
 		//console.log(this.cells);
 		if (
 			(this.board[0] === player && this.board[1] === player && this.board[2] === player) ||
@@ -65,18 +64,20 @@ $(document).ready(function () {
 
 		//if we found an empty cell the game is not over
 		for (var i = 0; i < 9; i++) {
-
-			if (this.board[i] === 0){
+			//console.log(this.board[i]);
+			if (this.board[i] == 0) {
 				return true;
 			}
 		}
 		return false;
 	};
+
+
 	//we draw the X or O corresponding to the player or cpu turn
 	Board.prototype.drawToken = function () {
 		for (var i = 0; i < 9; i++) {
 			//if the square is empty
-			if(this.board[i] === 0) {
+			if(this.board[i] == 0) {
 				this.cells[i].innerHTML = "";
 			} else {
 				if (this.board[i] === player){
@@ -92,7 +93,7 @@ $(document).ready(function () {
 		this.board = new Board();
 		this.message = $("message");
 		this.turn = 0;
-		this.state = 9;
+		this.state = null;
 		this.reset();
 	};
 	//checks if a value is even or not
@@ -103,7 +104,7 @@ $(document).ready(function () {
 	Game.prototype.showMessage = function(info) {
 		var message = document.getElementById("message");
 		message.innerHTML = info;
-		console.log(info);
+		//console.log(info);
 	};
 	//First move for the cpu is random. Return number
 	Game.prototype.randomCell = function(min,max) {
@@ -115,14 +116,15 @@ $(document).ready(function () {
 		this.board.reset();
 		if(!this.isEven(this.turn)) {
 			this.state = waiting;
-			this.showMessage("Your turn");
+			this.showMessage("Cpu turn");
 			this.board.writeCell(cpu, this.randomCell(0, 9));
-		} else {
+
+		}
 			this.turn++;
 			this.state = playing;
 			this.showMessage("Player turn");
 			this.board.drawToken();
-		}
+
 	};
  	//when a square is clicked this event is launch
 	Game.prototype.startMove = function(num) {
@@ -131,7 +133,7 @@ $(document).ready(function () {
 
 			if (this.board.isEmptyCell(num)) {
 
-				this.board.writeCell(player, num);
+				this.board.writeCell(1, num);
 
 				if (this.board.checkWin(player)) {
 					this.state = over;
@@ -143,14 +145,13 @@ $(document).ready(function () {
 
 				} else {
 					this.state = waiting;
-
-					this.showMessage("Cpu turn");
-
+					this.showMessage("Cpu turn2");
+					//initiate the AI
 					this.findMove();
 
 					if(this.board.checkWin(cpu)) {
 						this.state = over;
-						this.showMessage("Cpu win");
+						this.showMessage("Cpu wins");
 
 					} else if (!this.board.checkTie()) {
 
@@ -165,11 +166,11 @@ $(document).ready(function () {
 					}
 				}
 			}
-
 			this.board.drawToken();
-		} else if (this.state === over) {
-			this.game.reset();
-				}
+
+		} else if (this.state == over) {
+			   		this.reset();
+		}
 	};
 
 	Game.prototype.findMove = function () {
@@ -178,7 +179,7 @@ $(document).ready(function () {
 			pos = 0;
 		for (var i = 0; i < 9; i++) {
 			if (this.board.isEmptyCell(i)) {
-				this.board.writeCell(cpu, i );
+				this.board.writeCell(cpu, i);
 				prevMove = this.minMax();
 				if (prevMove > bestMove) {
 					bestMove = prevMove;
@@ -192,16 +193,16 @@ $(document).ready(function () {
 	};
 
 	Game.prototype.minMax = function() {
-		var prev, bestMove = 100;
+		var prevMove, bestMove = 100;
 
 		if (this.board.checkWin(cpu)) return 1;
 		if (!this.board.checkTie()) return 0 ;
 		for (var i = 0; i < 9; i++) {
 			if (this.board.isEmptyCell(i)) {
-				this.board.writeCell(cpu, i);
-				prev = this.maxMin();
-				if (prev < bestMove) {
-					bestMove = prev;
+				this.board.writeCell(player, i);
+				prevMove = this.maxMin();
+				if (prevMove < bestMove) {
+					bestMove = prevMove;
 				}
 				this.board.writeCell(0, i);
 			}
@@ -211,16 +212,16 @@ $(document).ready(function () {
 	};
 
 	Game.prototype.maxMin = function() {
-		var prev, bestMove = -100;
+		var prevMove, bestMove = -100;
 
 		if (this.board.checkWin(player)) return -1;
 		if (!this.board.checkTie()) return 0 ;
 		for (var i = 0; i < 9; i++) {
 			if (this.board.isEmptyCell(i)) {
 				this.board.writeCell(cpu, i);
-				prev = this.minMax();
-				if (prev > bestMove) {
-					bestMove = prev;
+				prevMove = this.minMax();
+				if (prevMove > bestMove) {
+					bestMove = prevMove;
 				}
 				this.board.writeCell(0, i);
 			}
@@ -228,16 +229,18 @@ $(document).ready(function () {
 		return bestMove;
 
 	};
-
+$(document).ready(function () {
+	'use strict';
 	var game = new Game();
 	$(".item").click(function() {
-		console.log(parseInt(this.getAttribute("num")));
+		//console.log(parseInt(this.getAttribute("num")));
+
+		//we get the value of attribute num as a string and we pass it as a integer
 		game.startMove(parseInt(this.getAttribute("num")));
 
 	});
 
 });
-
 
 
 
