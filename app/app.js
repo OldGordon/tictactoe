@@ -144,49 +144,53 @@ var Board = function () {
 		},
  	//when a square is clicked this event is launch
 		startMove = function(num) {
+				switch(this.state){
+					case 0:
+						if (this.board.isEmptyCell(num)) {
 
-				if (this.state === 0) {
+							this.board.writeCell(1, num);
 
-					if (this.board.isEmptyCell(num)) {
+							if (this.board.checkWin(this.player)) {
 
-						this.board.writeCell(1, num);
-
-						if (this.board.checkWin(this.player)) {
-							this.state = 2;
-							this.showMessage("You Win");
-
-						} else if (!this.board.checkTie()) {
-							this.state = 2;
-							this.showMessage("A tie");
-
-						} else {
-							this.state = 1;
-							this.showMessage("Cpu turn2");
-							//initiate the AI
-							this.findMove();
-
-							if(this.board.checkWin(this.cpu)) {
 								this.state = 2;
-								this.showMessage("Cpu wins");
+								this.showMessage("You Win");
 
 							} else if (!this.board.checkTie()) {
 
 								this.state = 2;
-
 								this.showMessage("A tie");
 
 							} else {
-								this.showMessage("Player turn");
 
-								this.state = 0;
+								this.state = 1;
+								this.showMessage("Cpu turn2");
+
+								//initiate the AI cpu turn
+								this.findMove();
+
+								if(this.board.checkWin(this.cpu)) {
+
+									this.state = 2;
+									this.showMessage("Cpu wins");
+
+								} else if (!this.board.checkTie()) {
+
+									this.state = 2;
+									this.showMessage("A tie");
+
+								} else {
+
+									this.showMessage("Player turn");
+									this.state = 0;
+								}
 							}
 						}
-					}
-					this.board.drawToken();
-
-				} else if (this.state == 2) {
-							this.reset();
-						}
+						this.board.drawToken();
+					    break;
+					case 2:
+						this.reset();
+						break;
+				}
 		},
 
 		findMove = function () {
