@@ -4,7 +4,7 @@
 /*global $, jQuery, alert*/
 
 	//constructor for the game board
-	var Board = function () {
+var Board = function () {
 
 		//we keep here 1,2 or 0 if the cell is empty
 		this.board = [];
